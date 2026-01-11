@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ummah Player | Master Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --bg: #050505; --card: #0f0f0f; --neon: #00ffa3; 
+            --blue: #00d2ff; --purple: #a020f0; --orange: #ff8c00; 
+            --border: rgba(255, 255, 255, 0.08);
+        }
+
+        body { 
+            font-family: 'Poppins', sans-serif; background: var(--bg); color: #fff; 
+            margin: 0; padding: 10px; min-height: 100vh; overflow-x: hidden;
+        }
+        
+        .admin-container { 
+            max-width: 100%; margin: 0 auto; background: var(--card); padding: 15px; 
+            border-radius: 20px; border: 1px solid var(--border);
+        }
+
+        .header-box { margin-bottom: 20px; border-left: 3px solid var(--neon); padding-left: 12px; }
+        .header-box h1 { margin: 0; font-size: 18px; font-weight: 800; }
+        .header-box p { margin: 0; font-size: 10px; color: #555; text-transform: uppercase; }
+
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        
+        .main-btn { 
+            padding: 15px 10px; border-radius: 12px; border: 1px solid var(--border); 
+            cursor: pointer; display: flex; flex-direction: column; 
+            align-items: flex-start; gap: 4px; color: #fff; background: rgba(255,255,255,0.02);
+            text-align: left;
+        }
+        .main-btn span { font-size: 9px; opacity: 0.5; text-transform: uppercase; font-weight: 600; }
+        .main-btn b { font-size: 12px; font-weight: 600; line-height: 1.2; }
+
+        .db-header { display: flex; align-items: center; justify-content: space-between; margin-top: 30px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+        .db-header h3 { font-size: 11px; color: #444; text-transform: uppercase; margin: 0; }
+
+        .video-item { 
+            display: flex; align-items: center; background: rgba(255,255,255,0.02); 
+            padding: 10px; border-radius: 15px; margin-top: 10px; 
+            border: 1px solid var(--border); gap: 10px; 
+        }
+        .pinned-item { border-color: var(--neon); background: rgba(0, 255, 163, 0.03); }
+        
+        .list-thumb { width: 70px; aspect-ratio: 16/9; border-radius: 8px; object-fit: cover; }
+        .v-info { flex: 1; min-width: 0; }
+        .v-info h4 { margin: 0; font-size: 13px; color: #eee; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        .badge { font-size: 8px; padding: 2px 6px; border-radius: 4px; font-weight: 700; background: #222; color: #888; margin-top: 4px; display: inline-block; }
+        .badge-pinned { background: var(--neon); color: #000; }
+
+        .action-group { display: flex; flex-direction: column; gap: 5px; }
+        .btn-action { padding: 6px 10px; border-radius: 8px; border: none; font-size: 9px; font-weight: 800; cursor: pointer; text-transform: uppercase; min-width: 55px; }
+        .btn-pin { background: #333; color: #fff; }
+        .btn-unpin { background: var(--neon); color: #000; }
+        .btn-del { background: rgba(255, 77, 77, 0.15); color: #ff4d4d; border: 1px solid rgba(255, 77, 77, 0.2); }
+
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000; padding: 15px; overflow-y: auto; }
+        .modal-content { 
+            max-width: 500px; margin: 10px auto; background: #0a0a0a; 
+            padding: 20px; border-radius: 20px; border: 1px solid var(--border);
+            position: relative;
+        }
+        
+        .input-group { margin-bottom: 12px; }
+        label { display: block; font-size: 9px; color: #555; margin-bottom: 4px; font-weight: 700; text-transform: uppercase; }
+        input, select, textarea { 
+            width: 100%; padding: 10px; border-radius: 10px; border: 1px solid var(--border); 
+            background: #000; color: #fff; outline: none; box-sizing: border-box; font-family: inherit; font-size: 13px;
+        }
+        
+        .save-btn { 
+            width: 100%; padding: 14px; border-radius: 12px; border: none; 
+            font-weight: 800; cursor: pointer; text-transform: uppercase; 
+            margin-top: 15px; font-size: 13px;
+        }
+
+        .close-btn { position: absolute; right: 15px; top: 15px; background: none; border: none; color: #555; font-size: 24px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="admin-container">
+    <div class="header-box">
+        <h1>Control Panel</h1>
+        <p>Ummah Player Mobile Admin</p>
+    </div>
+
+    <div class="menu-grid">
+        <button class="main-btn" onclick="openModal('uploadModal')">
+            <span>Video Manager</span>
+            <b>New Upload</b>
+        </button>
+        <button class="main-btn" onclick="openModal('rulesModal')">
+            <span>User Info</span>
+            <b>Guidelines</b>
+        </button>
+        <button class="main-btn" onclick="openModal('linkModal')">
+            <span>External</span>
+            <b>Join Link</b>
+        </button>
+        <button class="main-btn" onclick="openModal('updateCtrlModal')">
+            <span>Maintenance</span>
+            <b>App Update</b>
+        </button>
+    </div>
+
+    <div class="db-header">
+        <h3>Video Database</h3>
+        <span style="font-size: 8px; color: var(--neon);">● LIVE SYNC</span>
+    </div>
+    
+    <div id="adminList"></div>
+</div>
+
+<div id="uploadModal" class="modal">
+    <div class="modal-content">
+        <button class="close-btn" onclick="closeModal('uploadModal')">×</button>
+        <h2 style="margin:0 0 15px 0; font-size:16px; color:var(--neon);">Post Video</h2>
+        <div class="input-group"><label>URL</label><input type="text" id="vUrl" placeholder="Link..."></div>
+        <div class="input-group"><label>Title</label><input type="text" id="vTitle" placeholder="Title..."></div>
+        <div class="input-group">
+            <label>Category</label>
+            <select id="vCat">
+                <option value="Quran">Quran</option>
+                <option value="Naat">Naat</option>
+                <option value="Nasheed">Nasheed</option>
+                <option value="Bayan">Bayan</option>
+                <option value="News">News</option>
+            </select>
+        </div>
+        <div class="input-group" style="display:flex; align-items:center; gap:8px; background:#111; padding:10px; border-radius:10px;">
+            <input type="checkbox" id="vPin" style="width:16px; height:16px; accent-color:var(--neon);">
+            <label style="margin:0; color:#fff;">Feature (Pin)</label>
+        </div>
+        <button class="save-btn" style="background:var(--neon); color:#000;" onclick="addVideo()">Upload</button>
+    </div>
+</div>
+
+<div id="rulesModal" class="modal">
+    <div class="modal-content">
+        <button class="close-btn" onclick="closeModal('rulesModal')">×</button>
+        <h2 style="margin:0 0 15px 0; font-size:16px; color:var(--blue);">Edit Guidelines</h2>
+        <div class="input-group">
+            <label>Language</label>
+            <select id="editLang" onchange="syncRuleData()">
+                <option value="urdu">Urdu</option>
+                <option value="hindi">Hindi</option>
+                <option value="roman">Roman Hindi</option>
+                <option value="english">English</option>
+            </select>
+        </div>
+        <div class="input-group"><label>Page Title</label><input type="text" id="ruleTitle"></div>
+        <div style="background:rgba(255,255,255,0.03); padding:12px; border-radius:12px;">
+            <div class="input-group">
+                <label>Choose Rule</label>
+                <select id="ruleSelector" onchange="loadSpecificRule()">
+                    <option value="0">Rule 1</option><option value="1">Rule 2</option><option value="2">Rule 3</option>
+                </select>
+            </div>
+            <div class="input-group"><label>Heading</label><input type="text" id="activeH"></div>
+            <div class="input-group"><label>Content</label><textarea id="activeP" rows="3"></textarea></div>
+        </div>
+        <button class="save-btn" style="background:var(--blue); color:#000;" onclick="saveRules()">Update Rules</button>
+    </div>
+</div>
+
+<div id="linkModal" class="modal">
+    <div class="modal-content">
+        <button class="close-btn" onclick="closeModal('linkModal')">×</button>
+        <h2 style="color:var(--purple); font-size:16px;">Control Join Button</h2>
+        <div class="input-group">
+            <label>Select Language to Change</label>
+            <select id="linkLang" onchange="loadLinkOnly()">
+                <option value="urdu">Urdu</option>
+                <option value="hindi">Hindi</option>
+                <option value="roman">Roman Hindi</option>
+                <option value="english">English</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>Button Text (Label)</label>
+            <input type="text" id="ruleBtnText" placeholder="e.g., Join WhatsApp Group">
+        </div>
+        <div class="input-group">
+            <label>Button Link (URL)</label>
+            <input type="text" id="ruleBtnLink" placeholder="https://...">
+        </div>
+        <button class="save-btn" style="background:var(--purple); color:#fff;" onclick="saveLinkOnly()">Save Button Settings</button>
+    </div>
+</div>
+
+<div id="updateCtrlModal" class="modal">
+    <div class="modal-content">
+        <button class="close-btn" onclick="closeModal('updateCtrlModal')">×</button>
+        <h2 style="color:var(--orange);">System Update</h2>
+        <div class="input-group"><label>Version</label><input type="text" id="upVer"></div>
+        <div class="input-group"><label>Status</label><select id="upStatus"><option value="up-to-date">Stable</option><option value="update-available">Alert</option></select></div>
+        <div class="input-group"><label>Link</label><input type="text" id="upLink"></div>
+        <button class="save-btn" style="background:var(--orange); color:#000;" onclick="saveUpdateSettings()">Push Update</button>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, updateDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyB30-TGOTjq78jmnBbHK8c7Aaq4i0F5hoE",
+        authDomain: "media-39aa6.firebaseapp.com",
+        projectId: "media-39aa6",
+        storageBucket: "media-39aa6.firebasestorage.app",
+        messagingSenderId: "169143040828",
+        appId: "1:169143040828:web:08803c99cfe46442c8fc39"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    let currentRules = [{h:'',p:''}, {h:'',p:''}, {h:'',p:''}];
+
+    window.openModal = (id) => {
+        document.getElementById(id).style.display = 'block';
+        if(id==='linkModal') loadLinkOnly();
+        if(id==='rulesModal') syncRuleData();
+        if(id==='updateCtrlModal') loadUpdateSettings();
+    };
+    window.closeModal = (id) => document.getElementById(id).style.display = 'none';
+
+    // VIDEO MANAGEMENT
+    window.addVideo = async () => {
+        const url = document.getElementById('vUrl').value.trim();
+        const title = document.getElementById('vTitle').value.trim();
+        const isPinned = document.getElementById('vPin').checked;
+        if(!url || !title) return alert("Fill all!");
+        const ytId = url.match(/(?:youtu\.be\/|youtube\.com\/(?:.*v=|.*\/|.*embed\/))([^"&?\/\s]{11})/);
+        await addDoc(collection(db, "videos"), { title, category: document.getElementById('vCat').value, timestamp: Date.now(), isPinned, type: ytId ? "youtube" : "direct", ytId: ytId ? ytId[1] : url });
+        closeModal('uploadModal');
+    };
+
+    onSnapshot(query(collection(db, "videos"), orderBy("timestamp", "desc")), (snap) => {
+        const list = document.getElementById('adminList'); list.innerHTML = "";
+        snap.forEach(d => {
+            const v = d.data();
+            list.innerHTML += `<div class="video-item ${v.isPinned ? 'pinned-item' : ''}"><img src="${v.type==='youtube'?'https://img.youtube.com/vi/'+v.ytId+'/mqdefault.jpg':'https://via.placeholder.com/80'}" class="list-thumb"><div class="v-info"><h4>${v.title}</h4><span class="badge ${v.isPinned?'badge-pinned':''}">${v.isPinned?'PINNED':v.category}</span></div><div class="action-group"><button class="btn-action ${v.isPinned?'btn-unpin':'btn-pin'}" onclick="togglePin('${d.id}',${v.isPinned})">${v.isPinned?'UNPIN':'PIN'}</button><button class="btn-action btn-del" onclick="deleteV('${d.id}')">Delete</button></div></div>`;
+        });
+    });
+    window.togglePin = async (id, cur) => await updateDoc(doc(db, "videos", id), { isPinned: !cur });
+    window.deleteV = async (id) => { if(confirm("Delete?")) await deleteDoc(doc(db, "videos", id)); };
+
+    // RULES & LINK SETTINGS
+    window.syncRuleData = async () => {
+        const lang = document.getElementById('editLang').value;
+        const snap = await getDoc(doc(db, "app_settings", "rules_data"));
+        if(snap.exists() && snap.data()[lang]) {
+            const d = snap.data()[lang];
+            document.getElementById('ruleTitle').value = d.title || "";
+            currentRules = d.rules || [{h:'',p:''}, {h:'',p:''}, {h:'',p:''}];
+        } else { currentRules = [{h:'',p:''}, {h:'',p:''}, {h:'',p:''}]; }
+        loadSpecificRule();
+    };
+    window.loadSpecificRule = () => {
+        const idx = document.getElementById('ruleSelector').value;
+        document.getElementById('activeH').value = currentRules[idx].h || "";
+        document.getElementById('activeP').value = currentRules[idx].p || "";
+    };
+    window.saveRules = async () => {
+        const lang = document.getElementById('editLang').value;
+        const idx = document.getElementById('ruleSelector').value;
+        currentRules[idx] = { h: document.getElementById('activeH').value, p: document.getElementById('activeP').value };
+        const snap = await getDoc(doc(db, "app_settings", "rules_data"));
+        let fullData = snap.exists() ? snap.data() : {};
+        if(!fullData[lang]) fullData[lang] = {};
+        fullData[lang].title = document.getElementById('ruleTitle').value;
+        fullData[lang].rules = currentRules;
+        fullData[lang].isRtl = (lang === 'urdu');
+        await setDoc(doc(db, "app_settings", "rules_data"), fullData);
+        alert("Rules Saved!");
+    };
+
+    window.loadLinkOnly = async () => {
+        const lang = document.getElementById('linkLang').value;
+        const snap = await getDoc(doc(db, "app_settings", "rules_data"));
+        if(snap.exists() && snap.data()[lang]) {
+            document.getElementById('ruleBtnText').value = snap.data()[lang].btn_text || "";
+            document.getElementById('ruleBtnLink').value = snap.data()[lang].btn_link || "";
+        } else {
+            document.getElementById('ruleBtnText').value = "";
+            document.getElementById('ruleBtnLink').value = "";
+        }
+    };
+    window.saveLinkOnly = async () => {
+        const lang = document.getElementById('linkLang').value;
+        const snap = await getDoc(doc(db, "app_settings", "rules_data"));
+        let fullData = snap.exists() ? snap.data() : {};
+        if(!fullData[lang]) fullData[lang] = {};
+        fullData[lang].btn_text = document.getElementById('ruleBtnText').value;
+        fullData[lang].btn_link = document.getElementById('ruleBtnLink').value;
+        await setDoc(doc(db, "app_settings", "rules_data"), fullData);
+        alert("Join Button Updated!");
+    };
+
+    window.loadUpdateSettings = async () => {
+        const snap = await getDoc(doc(db, "app_settings", "update_info"));
+        if(snap.exists()) {
+            const d = snap.data();
+            document.getElementById('upVer').value = d.version || "";
+            document.getElementById('upStatus').value = d.status || "up-to-date";
+            document.getElementById('upLink').value = d.link || "";
+        }
+    };
+    window.saveUpdateSettings = async () => {
+        await setDoc(doc(db, "app_settings", "update_info"), { version: document.getElementById('upVer').value, status: document.getElementById('upStatus').value, link: document.getElementById('upLink').value });
+        alert("Update Pushed!");
+    };
+</script>
+</body>
+</html>
